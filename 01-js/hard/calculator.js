@@ -15,7 +15,144 @@
 
   Once you've implemented the logic, test your code by running
 */
+function validate(str){
+  let replarr = "()+-*/.";
+  for(let i=0;i<replarr.length;i++){
+    str =str.replaceAll(`${replarr[i]}`,'');}
+    if(parseInt(str).toString().length<str.length){
+      return true;
+    }
+    
+  }
 
-class Calculator {}
+
+function left_end(str,index){
+      while(parseInt(str[index-1]).toString().length==1 || str.slice(index-1,index)=="."){
+          
+        index--;
+      }
+      
+      return index;
+    }
+function right_end(str,index){
+      while(parseInt(str[index+1]).toString().length==1 || str.slice(index+1,index+2)=="."){
+        index++;
+      }
+      return index;
+    }
+class Calculator {
+  constructor(result){
+    this.result=0;
+  }
+  add(num){
+    this.result+=num;
+  }
+  subtract(num){
+    this.result-=num;
+  }
+  multiply(num){
+    this.result*=num;
+  }
+  divide(num){
+    this.result/=num;
+  }
+  clear(){
+    this.result=0;
+  }
+  getResult(){
+    return this.result;
+  }
+ calculate(str){
+    let strnew = str.split(" ").join("");
+    let self=this;
+    if(validate(strnew)){
+      throw Error;
+    }
+    let first,second=0;
+    
+    while((second<strnew.length)){
+      let u;
+      
+      if(strnew.slice(first,first+1)=="("){
+        
+        while(second<strnew.length){
+          if(strnew.slice(second,second+1)=="("){
+            first=second;
+          }
+          if(strnew.slice(second,second+1)==")"){
+            u=self.calculate(strnew.slice(first+1,second));
+            
+            strnew=strnew.replace(strnew.slice(first,second+1),u.toString());
+             
+            
+            second=0;
+            break;
+          }
+          second++;
+        }
+      }
+      second++;
+      first=second;
+      
+    }
+    
+   
+    //console.log(strnew.length);
+    for(let i=0;i<strnew.length;i++){
+        //console.log(strnew.length);
+        //console.log("hi")
+      if(strnew[i]=='*'){
+        //console.log("himul")
+        //console.log(left_end(strnew,i));
+        if((right_end(strnew,i)+1)!=strnew.length){
+        strnew=strnew.replace(strnew.slice(left_end(strnew,i),right_end(strnew,i)+1),((parseFloat(strnew.slice(left_end(strnew,i),i)))*(parseFloat(strnew.slice(i+1,right_end(strnew,i)+1)))).toString());
+        }
+        else{
+        strnew=strnew.replace(strnew.slice(left_end(strnew,i)),((parseFloat(strnew.slice(left_end(strnew,i),i)))*(parseFloat(strnew.slice(i+1)))).toString());
+        
+        }
+        i=0;
+      }
+      if(strnew[i]=='/'){
+        if((right_end(strnew,i)+1)!=strnew.length){
+            strnew=strnew.replace(strnew.slice(left_end(strnew,i),right_end(strnew,i)+1),((parseFloat(strnew.slice(left_end(strnew,i),i)))/(parseFloat(strnew.slice(i+1,right_end(strnew,i)+1)))).toString());
+            }
+            else{
+            strnew=strnew.replace(strnew.slice(left_end(strnew,i)),((parseFloat(strnew.slice(left_end(strnew,i),i)))/(parseFloat(strnew.slice(i+1)))).toString());
+            
+            }
+            i=0;
+      }
+    }
+    
+    for(let i=0;i<strnew.length;i++){
+      if(strnew[i]=='+'){
+        if((right_end(strnew,i)+1)!=strnew.length){
+            strnew=strnew.replace(strnew.slice(left_end(strnew,i),right_end(strnew,i)+1),((parseFloat(strnew.slice(left_end(strnew,i),i)))+(parseFloat(strnew.slice(i+1,right_end(strnew,i)+1)))).toString());
+            }
+            else{
+                
+            strnew=strnew.replace(strnew.slice(left_end(strnew,i)),((parseFloat(strnew.slice(left_end(strnew,i),i)))+(parseFloat(strnew.slice(i+1)))).toString());
+            
+            }
+            i=0;
+      }
+      if(strnew[i]=='-'){
+        if((right_end(strnew,i)+1)!=strnew.length){
+            strnew=strnew.replace(strnew.slice(left_end(strnew,i),right_end(strnew,i)+1),((parseFloat(strnew.slice(left_end(strnew,i),i)))-(parseFloat(strnew.slice(i+1,right_end(strnew,i)+1)))).toString());
+            }
+            else{
+            strnew=strnew.replace(strnew.slice(left_end(strnew,i)),((parseFloat(strnew.slice(left_end(strnew,i),i)))-(parseFloat(strnew.slice(i+1)))).toString());
+            
+            }
+            i=0;
+      }
+    }
+    if(strnew.length==1){
+      this.result=parseFloat(strnew);
+    }
+    return parseFloat(strnew);
+  }
+}
 
 module.exports = Calculator;
