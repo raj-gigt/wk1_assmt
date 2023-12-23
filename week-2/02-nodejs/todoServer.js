@@ -41,9 +41,105 @@
  */
   const express = require('express');
   const bodyParser = require('body-parser');
-  
+  const port = 5500
   const app = express();
-  
+  function uniqueNumber() {
+    var date = Date.now();
+
+    if (date <= uniqueNumber.previous) {
+        date = ++uniqueNumber.previous;
+    } else {
+        uniqueNumber.previous = date;
+    }
+
+    return date;
+}
+  class todo{
+    constructor(id,title,description){
+      this.id=id
+      this.title=title
+      this.description=description
+    }
+  };
+  let todo_arr=[]
   app.use(bodyParser.json());
-  
+  app.get('/todos', (req, res) => {
+    try{
+    res.status(200).json(todo_arr)}
+    catch(error){
+      res.status(404).send()
+    }
+  })
+  app.get('/todos/:id', (req,res) => {
+    try{
+      let count=0;
+      for(let i=0;i<todo_arr.length;i++){
+        if(todo_arr[i].id==parseInt(req.params.id)){
+          res.status(200).json(todo_arr[i]);
+          count++;
+          break;
+        }
+      }
+      if(count==0){
+        res.status(404).send();
+      }
+    }
+    catch(error){
+      res.status(404).send();
+    }
+  })
+  app.post('/todos', (req,res) => {
+    try{
+      uniqueNumber.previous=0
+      let todo_id=uniqueNumber();
+      todo_arr.push(new todo(todo_id,req.body.title,req.body.description))
+      res.status(201).json({
+        id: todo_id
+      });
+    }
+    catch(error){
+      res.status(404).send();
+    }
+  })
+  app.put('/todos/:id',(req,res) => {
+    try{
+      let count=0;
+      for(let i=0;i<todo_arr.length;i++){
+        if(todo_arr[i].id==parseInt(req.params.id)){
+          todo_arr[i].title=req.body.title;
+          todo_arr[i].description=req.body.description
+          res.status(200).send()
+          count++;
+          break;
+        }
+      }
+      if(count==0){
+        res.status(404).send();
+      }
+    }
+    catch(error){
+      res.status(404).send();
+    }
+  })
+  app.delete('/todos/:id',(req,res) => {
+    try{
+      let count=0;
+      for(let i=0;i<todo_arr.length;i++){
+        if(todo_arr[i].id==parseInt(req.params.id)){
+          count++;
+          todo_arr.splice(i,1);
+          res.status(200).send();
+        }}
+        if(count==0){
+          res.status(404).send();
+        }
+      
+  }
+    catch(error){
+      res.status(404).send();
+    }})
+    app.use((req, res, next) => {
+      res.status(404).send();
+    });
+  app.listen(port)
   module.exports = app;
